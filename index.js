@@ -1,7 +1,13 @@
+require("dotenv").config();
 const express = require("express");
-const database = require("./database/index")
+const mongoose = require("mongoose");
+const database = require("./database/index");
 const book_application = express();
 book_application.use(express.json());
+
+mongoose.set('strictQuery', true);
+
+mongoose.connect(process.env.MONGO_URL).then(()=> console.log("connection established"));
 
 
 //API'S
