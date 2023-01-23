@@ -144,6 +144,51 @@ book_application.put("/book/author/update/:isbn", (req,res) =>{
     return res.json({books : database.books, authors : database});
 });
 
+/* Books delete  --------------------------------------------------------------------------------- */
+
+/* 
+route              /book/delete
+description        deleting book
+access             Public
+parameters         isbn
+method             delete
+*/
+
+book_application.delete("/book/delete/:isbn", (req,res) => {
+
+    const newBooks = database.books.filter( (book) => book.ISBN !== req.params.isbn);
+    database.books = newBooks;
+    return res.json({books : database.books, result: "book is deleted"});
+
+});
+
+/* 
+route              /book/author/book
+description        deleting author from a book
+access             Public
+parameters         isbn
+method             delete
+*/
+
+book_application.delete("/book/author/book/:isbn" , (req,res) => {
+    database.books.forEach((book) => {
+        if(book.ISBN === req.params.isbn){
+            const newAuthors = book.Authors.filter((auth) => auth !== req.body.authid);
+            book.Authors =newAuthors;
+            return
+        }
+    });
+
+    database.Authors.forEach((auth) => {
+        if(auth.id === req.body.authid){
+            const newbooks = auth.books.filter( (book) => book !== req.params.isbn);
+            auth.books=newbooks;
+            return
+        }
+    });
+    return res.json({books : database.books , authors: database.Authors});
+});
+
 /* Authors get  --------------------------------------------------------------------------------- */
 
 /* 
