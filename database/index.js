@@ -39,6 +39,11 @@ const publications = [{
     id : 1,
     name : "Akhil publication",
     books : ["12345ONE"]
+},
+{
+    id : 2,
+    name : "Akhil1 publication",
+    books : ["12345ONE"]
 }];
 
 module.exports = {books,Authors,publications};

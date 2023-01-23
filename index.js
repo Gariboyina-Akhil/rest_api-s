@@ -206,6 +206,26 @@ book_application.post("/author/new", (req,res) => {
 
 });
 
+/* authors   put --------------------------------------------------------------------------------- */
+
+/* 
+route              /author/update/
+description        update title of a book
+access             Public
+parameters         isbn
+method             put
+*/
+
+book_application.put("/author/update/:id", (req,res) =>{
+    database.Authors.forEach((auth) => {
+        if(auth.id=== parseInt(req.params.id)){
+            auth.name=req.body.newName;
+            return;
+        }
+    });
+    return res.json({books : database.Authors});
+});
+
 /* publications get  --------------------------------------------------------------------------------- */
 
 /* 
@@ -236,6 +256,50 @@ book_application.post("/publication/new", (req,res) => {
     database.publications.push(newPub);
     return res.json({Authors : database.publications, result: "publication is added"});
 
+});
+
+/* publication   put --------------------------------------------------------------------------------- */
+
+/* 
+route              /publication/name/update
+description        update title of a book
+access             Public
+parameters         id
+method             put
+*/
+
+book_application.put("/publication/name/update/:id", (req,res) =>{
+    database.publications.forEach((pub) => {
+        if(pub.id=== parseInt(req.params.id)){
+            pub.name=req.body.newName;
+            return;
+        }
+    });
+    return res.json({books : database.publications});
+});
+
+/* 
+route              /publication/update/book
+description        add/updation of publication of a book
+access             Public
+parameters         isbn
+method             put
+*/
+
+book_application.put("/publication/update/book/:isbn" , (req,res) =>{
+    database.publications.forEach((pub) => {
+        if(pub.id === req.body.id){
+            return pub.books.push(req.params.isbn);
+        }
+    });
+
+    database.books.forEach((book) =>{
+        if(book.ISBN === req.params.isbn){
+            book.publications = req.body.id;
+            return
+        }
+    });
+    return res.json({publications: database.publications , books : database.books ,result : "success"});
 });
 
 
