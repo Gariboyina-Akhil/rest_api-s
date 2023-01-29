@@ -1,0 +1,12 @@
+"newBook": {
+        "ISBN": "12345TWO",
+        "name": "getting started with datastructures",
+        "Authors": [],
+        "language": "en",
+        "pubDate": "2008-04-05",
+        "noOfPages": 225,
+        "category": [
+            "Action"
+        ],
+        "publications": 1
+    }

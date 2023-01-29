@@ -158,7 +158,7 @@ book_application.put("/book/author/update/:isbn",async (req,res) =>{
     const updatedBook = await BookModel.findOneAndUpdate({
         ISBN : req.params.isbn
     },{
-        $push : {
+        $addToSet : {
             Authors : req.body.newAuthor
         }
     },{
@@ -168,7 +168,7 @@ book_application.put("/book/author/update/:isbn",async (req,res) =>{
     const updatedAuthor = await AuthorModel.findOneAndUpdate({
         id : req.body.newAuthor
     },{
-        $push : {
+        $addToSet : {
             books : req.params.isbn
         }
     },{
@@ -200,11 +200,13 @@ parameters         isbn
 method             delete
 */
 
-book_application.delete("/book/delete/:isbn", (req,res) => {
-
-    const newBooks = database.books.filter( (book) => book.ISBN !== req.params.isbn);
-    database.books = newBooks;
-    return res.json({books : database.books, result: "book is deleted"});
+book_application.delete("/book/delete/:isbn", async (req,res) => {
+    const newBooks = await BookModel.findOneAndDelete({
+        ISBN : req.params.isbn
+    });
+    /*const newBooks = database.books.filter( (book) => book.ISBN !== req.params.isbn);
+    database.books = newBooks;*/
+    return res.json({books : newBooks, result: "book is deleted"});
 
 });
 
@@ -216,8 +218,27 @@ parameters         isbn
 method             delete
 */
 
-book_application.delete("/book/author/book/:isbn" , (req,res) => {
-    database.books.forEach((book) => {
+book_application.delete("/book/author/book/:isbn" , async (req,res) => {
+    const newBook = await BookModel.findOneAndUpdate({
+        ISBN : req.params.isbn
+    },{
+        $pull :{
+            Authors : req.body.authorId
+        }
+    },{
+        new : true
+    });
+
+    const newAuthor = await AuthorModel.findOneAndUpdate({
+        id : req.body.authorId
+    },{
+        $pull :{
+            books : req.params.isbn
+        }
+    },{
+        new:true
+    });
+    /*database.books.forEach((book) => {
         if(book.ISBN === req.params.isbn){
             const newAuthors = book.Authors.filter((auth) => auth !== req.body.authid);
             book.Authors =newAuthors;
@@ -231,8 +252,8 @@ book_application.delete("/book/author/book/:isbn" , (req,res) => {
             auth.books=newbooks;
             return
         }
-    });
-    return res.json({books : database.books , authors: database.Authors});
+    });*/
+    return res.json({book : newBook , author: newAuthor , result : "deleted"});
 });
 
 /* Authors get  --------------------------------------------------------------------------------- */
