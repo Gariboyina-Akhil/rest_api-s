@@ -6,9 +6,9 @@ const mongoose = require("mongoose");
 const database = require("./database/index");
 
 //models
-const BookModels = require("./database/book");
-const AuthorModels = require("./database/author");
-const PublicationModels = require("./database/publication");
+const BookModel = require("./database/book");
+const AuthorModel = require("./database/author");
+const PublicationModel = require("./database/publication");
 
 //express connection
 const book_application = express();
@@ -30,22 +30,24 @@ access             Public
 parameters         None
 method             get
 */
-book_application.get("/", (req,res) => {
-    return res.json({books : database.books});
+book_application.get("/", async (req,res) => {
+    const getAllBooks = await BookModel.find();
+    return res.json({books :getAllBooks});
 });
 
 /* 
-route              /
+route              /is
 description        specific book
 access             Public
 parameters         isbn
 method             get
 */
 
-book_application.get("/is/:isbn", (req,res) => {
-    const requiredBook = database.books.filter((book) => book.ISBN === req.params.isbn);
-    if(requiredBook.length===0) return res.json({error : "Book not found"});
-    return res.json({book : requiredBook[0]});
+book_application.get("/is/:isbn", async (req,res) => {
+    const requiredBook = await BookModel.findOne({ISBN : req.params.isbn});
+    //const requiredBook = database.books.filter((book) => book.ISBN === req.params.isbn);
+    if(!requiredBook) return res.json({error : "Book not found"});
+    return res.json({book : requiredBook});
 });
 
 /* 
@@ -56,8 +58,9 @@ parameters         category
 method             get
 */
 
-book_application.get("/c/:category", (req,res) => {
-    const requiredBook = database.books.filter((book) =>{ 
+book_application.get("/c/:category", async (req,res) => {
+    const requiredBook = await BookModel.findOne({category : req.params.category});
+    /*const requiredBook = database.books.filter((book) =>{ 
     let bo = false;
     for(let i=0;i<book.category.length;i++){
         if(book.category[i].toLowerCase()===req.params.category.toLowerCase()){
@@ -67,8 +70,8 @@ book_application.get("/c/:category", (req,res) => {
     }
     return bo;
     }
-    );
-    if(requiredBook.length===0) return res.json({error : "Book not found"});
+    );*/
+    if(!requiredBook) return res.json({error : "Book not found"});
     return res.json({book : requiredBook});
 });
 
@@ -80,8 +83,9 @@ parameters         category
 method             get
 */
 
-book_application.get("/a/:author", (req,res) => {
-    const requiredBook = database.books.filter((book) =>{ 
+book_application.get("/a/:author",async (req,res) => {
+    const requiredBook = await BookModel.findOne({Authors : parseInt(req.params.author)});
+    /*const requiredBook = database.books.filter((book) =>{ 
     let bo = false;
     for(let i=0;i<book.Authors.length;i++){
         if(book.Authors[i]===parseInt(req.params.author)){
@@ -91,8 +95,8 @@ book_application.get("/a/:author", (req,res) => {
     }
     return bo;
     }
-    );
-    if(requiredBook.length===0) return res.json({error : "Book not found"});
+    );*/
+    if(!requiredBook) return res.json({error : "Book not found"});
     return res.json({authors : requiredBook});
 });
 
@@ -106,11 +110,11 @@ parameters         category
 method             post
 */
 
-book_application.post("/book/new", (req,res) => {
+book_application.post("/book/new", async (req,res) => {
 
     const {newBook} = req.body;
-    database.books.push(newBook);
-    return res.json({books : database.books, result: "book is added"});
+    const addNewBook = BookModel.create(newBook);
+    return res.json({books : addNewBook, result: "book is added"});
 
 });
 
@@ -214,8 +218,9 @@ parameters         None
 method             get
 */
 
-book_application.get("/authors", (req,res) => {
-    return res.json({books : database.Authors});
+book_application.get("/authors", async (req,res) => {
+    const getAllAuthors = await AuthorModel.find();
+    return res.json({books : getAllAuthors});
 });
 
 /* 
@@ -226,10 +231,10 @@ parameters         id
 method             get
 */
 
-book_application.get("/authors/id/:id", (req,res) => {
-    const requiredAuthor = database.Authors.filter((author) => author.id === parseInt(req.params.id));
-    if(requiredAuthor.length===0) return res.json({error : "Author not found"});
-    return res.json({book : requiredAuthor[0]});
+book_application.get("/authors/id/:id", async (req,res) => {
+    const requiredAuthor =await AuthorModel.findOne({id : parseInt(req.params.id)});
+    if(!requiredAuthor) return res.json({error : "Author not found"});
+    return res.json({book : requiredAuthor});
 });
 
 /* 
@@ -240,10 +245,10 @@ parameters         isbn
 method             get
 */
 
-book_application.get("/authors/is/:isbn", (req,res) => {
-    const requiredAuthor = database.Authors.filter((author) => author.books.includes(req.params.isbn));
-    if(requiredAuthor.length===0) return res.json({error : "Author not found"});
-    return res.json({book : requiredAuthor});
+book_application.get("/authors/is/:isbn", async (req,res) => {
+    const requiredAuthor = await AuthorModel.findOne({books : req.params.isbn});
+    if(!requiredAuthor) return res.json({error : "Author not found"});
+    return res.json({books : requiredAuthor});
 });
 
 
@@ -258,11 +263,11 @@ parameters         category
 method             post
 */
 
-book_application.post("/author/new", (req,res) => {
+book_application.post("/author/new", async(req,res) => {
 
     const {newAuthor} = req.body;
-    database.Authors.push(newAuthor);
-    return res.json({Authors : database.Authors, result: "Author is added"});
+    const addNewAuthor = AuthorModel.create(newAuthor);
+    return res.json({Authors : addNewAuthor, result: "Author is added"});
 
 });
 
