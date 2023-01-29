@@ -301,8 +301,9 @@ parameters         None
 method             get
 */
 
-book_application.get("/publications", (req,res) => {
-    return res.json({books : database.publications});
+book_application.get("/publications", async (req,res) => {
+    const requiredPublication = await PublicationModel.find()
+    return res.json({publications : requiredPublication});
 });
 
 /* authors Post  --------------------------------------------------------------------------------- */
@@ -318,8 +319,8 @@ method             post
 book_application.post("/publication/new", (req,res) => {
 
     const {newPub} = req.body;
-    database.publications.push(newPub);
-    return res.json({Authors : database.publications, result: "publication is added"});
+    const addNewPublication = PublicationModel.create(newPub)
+    return res.json({publications : addNewPublication, result: "publication is added"});
 
 });
 
