@@ -1,12 +1,21 @@
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
+
+//database
 const database = require("./database/index");
+
+//models
+const BookModels = require("./database/book");
+const AuthorModels = require("./database/author");
+const PublicationModels = require("./database/publication");
+
+//express connection
 const book_application = express();
 book_application.use(express.json());
 
+//mongoose connection
 mongoose.set('strictQuery', true);
-
 mongoose.connect(process.env.MONGO_URL).then(()=> console.log("connection established"));
 
 
